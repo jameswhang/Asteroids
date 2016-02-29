@@ -1,7 +1,8 @@
 ; #########################################################################
 ;
 ;   lines.asm - Assembly file for EECS205 Assignment 2
-;	Author: Adel Lahlou - adl538
+;   Author: James Whang (syw973)
+;	    sungyoonwhang2017@u.northwestern.edu
 ;
 ; #########################################################################
 

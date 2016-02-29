@@ -12,6 +12,15 @@ MouseInfo STRUCT
  buttons DWORD ?
 MouseInfo ENDS
 
+
+;; Sprite Struct : Defines x,y coordinates and rotation of a sprite
+SPRITEINFO STRUCT
+ obj 
+ x_coord DWORD ?
+ y_coord DWORD ?
+ rotation FXPT ?
+SPRITEINFO ENDS
+
 MK_CONTROL  = 0008h  ;; The CTRL key is down.
 MK_LBUTTON  = 0001h  ;; The left mouse button is down.
 MK_MBUTTON  = 0010h  ;; The middle mouse button is down.
@@ -24,6 +33,10 @@ MK_XBUTTON2 = 0040h  ;; The second X button is down.
 BlackStarField	PROTO
 DrawStr PROTO myStr:PTR BYTE, x:DWORD, y:DWORD, color:DWORD
 
+;; Sprites
+EXTERNDEF asteroid_000:EECS205BITMAP
+EXTERNDEF fighter_000:EECS205BITMAP
+
 ;; Library Data
 EXTERNDEF StarBitmap:EECS205BITMAP
 EXTERNDEF MouseStatus:MouseInfo
@@ -34,9 +47,6 @@ EXTERNDEF KeyPress:DWORD
 ;; User Defined Functions
 GameInit PROTO
 GamePlay PROTO
-
-
-
 
 
 
