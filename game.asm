@@ -380,13 +380,24 @@ asteroid_001 EECS205BITMAP <32, 32, 255,, offset asteroid_001 + sizeof asteroid_
 	BYTE 049h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 
 ;; SPRITE STRUCTS
-ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0>
-ASTEROID_1 SPRITE <offset asteroid_001, 400, 350, 0>
+ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0, 18, 16>
+ASTEROID_1 SPRITE <offset asteroid_001, 400, 150, 0, 16, 16>
 FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
 
+;; Some game-related boolean values
+isDead BYTE 0 ;; Checks if there was a collision
+doRotate BYTE 1 ;; This rotates the asteroids
+gameStarted BYTE 0 ;; Sets to 1 if user does anything
+
+
+;; Strings that appear in the game
 boomStr BYTE "Boom!", 0
-testStr BYTE "Test!", 0
-instructionStr BYTE "Press up/down arrow key to move the fighter jet!", 0
+deadStr BYTE "GAME OVER!", 0
+stopRotateStr BYTE "You don't like these little asteroids moving???", 0
+stopRotateInstStr BYTE "Click left button on mouse to keep them still!", 0
+keepRotateInstStr BYTE "Click right button on mouse to keep them moving!", 0
+keepRotateStr BYTE "You don't like these little asteroids staying still???", 0
+instructionStr BYTE "Press the arrow keys to move the fighter jet around!", 0
 
 .CODE
 
@@ -423,49 +434,89 @@ DrawAllSprites ENDP
 GameInit PROC uses ecx edi esi
 	INVOKE DrawStarField
 	INVOKE DrawAllSprites
-	ret         ;; Do not delete this line!!!
+	ret    
 GameInit ENDP
 
 
 GamePlay PROC uses ecx
 	INVOKE ClearScreen ;; Clear the screen first
 	INVOKE DrawStarField ;; Draw da stars
+
+	cmp gameStarted, 0
+	jnz GAMESTARTED
 	INVOKE DrawStr, offset instructionStr, 80, 10, 0ffh
+
+GAMESTARTED:
+	cmp isDead, 0
+	jnz DEAD
+	
+	cmp doRotate, 0
+	je NOROTATE
 
 	INVOKE RotateRight, offset ASTEROID_0
 	INVOKE RotateLeft, offset ASTEROID_1
-;	INVOKE CheckCollision ;; Check if any collision 
-	
 
+NOROTATE:
+	;; Check if any collision 
+	INVOKE CheckCollision, offset FIGHTER, offset ASTEROID_0, offset ASTEROID_1
+	cmp eax, 0
+	je NOCOL
+	mov isDead, 1
+	jmp GAME_END
+NOCOL:
+	INVOKE LeftMouseOn ; Check if the user pressed left mouse btn 
+	cmp eax, 0
+	jne CHECK_RMOUSE
+	mov gameStarted, 1
+	mov doRotate, 0
+	INVOKE DrawStr, offset stopRotateStr, 130, 20, 0ffh
+	INVOKE DrawStr, offset keepRotateInstStr, 130, 40, 0ffh
+CHECK_RMOUSE:
+	INVOKE RightMouseOn ; Check if the user pressed right mouse btn
+	cmp eax, 0
+	jne CHECK_SPACE
+	mov gameStarted, 1
+	mov doRotate, 1
+	INVOKE DrawStr, offset keepRotateStr, 130, 20, 0ffh
+	INVOKE DrawStr, offset stopRotateInstStr, 130, 40, 0ffh
+CHECK_SPACE:
 	INVOKE SpaceOn	;; Check if the user pressed space
 	cmp eax, 0
 	jl CHECK_ARROWS
+	mov gameStarted, 1
 	INVOKE DrawStr, offset boomStr, 20, 20, 0ffh
-	;INVOKE DrawAllSprites
 
 CHECK_ARROWS:
 	INVOKE UpArrowOn ;; Check if the user pressed up key
 	cmp eax, 0
 	jl CHECK_DOWNKEY
+	mov gameStarted, 1
 	INVOKE MoveUp, OFFSET FIGHTER ;; Move the jet up
 
 CHECK_DOWNKEY:
 	INVOKE DownArrowOn ;; Check if the user pressed down key
 	cmp eax, 0
 	jl CHECK_LEFTKEY
+	mov gameStarted, 1
 	INVOKE MoveDown, OFFSET FIGHTER ;; Move the thing down
 
 CHECK_LEFTKEY:
 	INVOKE LeftArrowOn ;; Check if the user pressed left key
 	cmp eax, 0
 	jl CHECK_RIGHTKEY
+	mov gameStarted, 1
 	INVOKE MoveLeft, OFFSET FIGHTER ;; Move the thing left
 
 CHECK_RIGHTKEY:
 	INVOKE RightArrowOn ;; Check if the user pressed right key
 	cmp eax, 0
 	jl GAME_END
+	mov gameStarted, 1
 	INVOKE MoveRight, OFFSET FIGHTER ;; Move the thing right
+	jmp GAME_END
+
+DEAD:
+	INVOKE DrawStr, offset deadStr, 280, 150, 0ffh ;; Dispay game over string
 
 GAME_END:
 	INVOKE DrawAllSprites

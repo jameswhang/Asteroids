@@ -316,9 +316,7 @@ NOT_SAME_Y:
 
 
   FINISH_Y0:
-  	;; move things into registers to make em fast
-  	;; Initialize for for loop
-
+  	;; Initialize for loop
   	mov ecx, edx 						;; i = y0
   	mov edi, fixed_inc
   	mov edx, fixed_j

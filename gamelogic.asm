@@ -18,9 +18,35 @@ include keys.inc
 include game.inc
 
 .DATA
+ASTEROID_0_POS EECS205RECT <172, 226, 228, 174>
+ASTEROID_1_POS EECS205RECT <384, 166, 416, 134>
+FIGHTER_POS EECS205RECT <328, 319, 372, 281>
+
 
 
 .CODE
+;; Returns 0 if the user is pressing left mouse key, -1 otherwise
+LeftMouseOn PROC uses ecx
+	mov eax, 0
+	mov ecx, MouseStatus.buttons
+	cmp ecx, MK_LBUTTON
+	je TRUE
+	mov eax, -1
+TRUE:
+	ret
+LeftMouseOn ENDP
+
+;; Returns 0 if the user is pressing right mouse key, -1 otherwise
+RightMouseOn PROC uses ecx
+	mov eax, 0
+	mov ecx, MouseStatus.buttons
+	cmp ecx, MK_RBUTTON
+	je TRUE
+	mov eax, -1
+TRUE:
+	ret
+RightMouseOn ENDP
+
 ;; RETURNS 0 if the user is pressing space key, -1 otherwise
 SpaceOn PROC uses ecx
 	mov eax, 0
@@ -31,7 +57,6 @@ SpaceOn PROC uses ecx
 TRUE:
 	ret
 SpaceOn ENDP
-
 
 ;; RETURNS 0 if the user is pressing down arrow key, -1 otherwise
 DownArrowOn PROC uses ecx esi edi
@@ -66,7 +91,7 @@ TRUE:
 	ret
 UpArrowOn ENDP
 
-;; RETURNS 0 if the user is pressing right arrow key, -1 otherwise
+;; RETURNS 0 if the user is pressing.dwRight arrow key, -1 otherwise
 RightArrowOn PROC
 	mov eax, 0
 	mov ecx, KeyDown
@@ -77,7 +102,7 @@ TRUE:
 	ret
 RightArrowOn ENDP
 	
-;; RETURNS 0 if the user is pressing left arrow key, -1 otherwise
+;; RETURNS 0 if the user is pressing.dwLeft arrow key, -1 otherwise
 LeftArrowOn PROC
 	mov eax, 0
 	mov ecx, KeyDown
@@ -99,7 +124,7 @@ TRUE:
 	ret
 UpArrowOff ENDP
 
-;; Moves a sprite up
+;; Moves a SPRITE up
 MoveUp PROC uses ecx sprite:DWORD
 	mov ecx, sprite
 	mov eax, (SPRITE PTR [ecx]).y_coord
@@ -157,9 +182,65 @@ RotateLeft PROC uses edx sprite:PTR EECS205BITMAP
 	ret
 RotateLeft ENDP
 
-;; Checks if there's any collisions
-CheckCollision PROC fighter:PTR EECS205BITMAP, asteroid1:PTR EECS205BITMAP, asteroid2:PTR EECS205BITMAP
+;; Checks if there's any collisions. Returns -1 if there's a collision. 0 otherwise
+CheckCollision PROC fighter:PTR EECS205BITMAP, asteroid0:PTR EECS205BITMAP, asteroid1:PTR EECS205BITMAP
+
+	;; First update the positions of all SPRITEs
+	mov eax, fighter
+	mov edx, (SPRITE ptr [eax]).x_coord
+	mov edi, (SPRITE ptr [eax]).wide
+	mov FIGHTER_POS.dwLeft, edx
+	mov FIGHTER_POS.dwRight, edx
+	sub FIGHTER_POS.dwLeft, edi
+	add FIGHTER_POS.dwRight, edi
 	
+	mov edx, (SPRITE ptr [eax]).y_coord
+	mov edi, (SPRITE ptr [eax]).height
+	mov FIGHTER_POS.dwTop, edx
+	mov FIGHTER_POS.dwBottom, edx
+	sub FIGHTER_POS.dwTop, edi
+	add FIGHTER_POS.dwBottom, edi 
+	
+	mov eax, asteroid0
+	mov edx, (SPRITE ptr [eax]).x_coord
+	mov edi, (SPRITE ptr [eax]).wide
+	mov ASTEROID_0_POS.dwLeft, edx
+	mov ASTEROID_0_POS.dwRight, edx
+	sub ASTEROID_0_POS.dwLeft, edi
+	add ASTEROID_0_POS.dwRight, edi
+	
+	mov edx, (SPRITE ptr [eax]).y_coord
+	mov edi, (SPRITE ptr [eax]).height
+	mov ASTEROID_0_POS.dwTop, edx
+	mov ASTEROID_0_POS.dwBottom, edx
+	sub ASTEROID_0_POS.dwTop, edi
+	add ASTEROID_0_POS.dwBottom, edi 
+
+	mov eax, asteroid1
+	mov edx, (SPRITE ptr [eax]).x_coord
+	mov edi, (SPRITE ptr [eax]).wide
+	mov ASTEROID_1_POS.dwLeft, edx
+	mov ASTEROID_1_POS.dwRight, edx
+	sub ASTEROID_1_POS.dwLeft, edi
+	add ASTEROID_1_POS.dwRight, edi
+	
+	mov edx, (SPRITE ptr [eax]).y_coord
+	mov edi, (SPRITE ptr [eax]).height
+	mov ASTEROID_1_POS.dwTop, edx
+	mov ASTEROID_1_POS.dwBottom, edx
+	sub ASTEROID_1_POS.dwTop, edi
+	add ASTEROID_1_POS.dwBottom, edi 
+
+
+	;; Use CheckIntersectRect to see if there was any collision
+
+	INVOKE CheckIntersectRect, OFFSET FIGHTER_POS, OFFSET ASTEROID_0_POS
+	cmp eax, 0
+	jl COLLIDES
+
+	INVOKE CheckIntersectRect, OFFSET FIGHTER_POS, OFFSET ASTEROID_1_POS
+
+COLLIDES:
 	ret
 
 CheckCollision ENDP
