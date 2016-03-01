@@ -34,6 +34,7 @@ DrawStarField proc
 	INVOKE DrawStar, 355, 81
 	INVOKE DrawStar, 588, 28
 	INVOKE DrawStar, 181, 420
+	INVOKE DrawStar, 558, 140
 	INVOKE DrawStar, 224, 398
 	INVOKE DrawStar, 220, 424
 	INVOKE DrawStar, 28, 484

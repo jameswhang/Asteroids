@@ -340,9 +340,6 @@ DrawLine ENDP
 
 
 
-
-
-
 ;;;;;; STARS ASSIGNMENT FUNCTIONS
 
 END

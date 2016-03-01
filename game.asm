@@ -308,40 +308,99 @@ asteroid_000 EECS205BITMAP <56, 53, 255,, offset asteroid_000 + sizeof asteroid_
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,091h,091h,091h,091h,091h,049h,049h,0ffh,0ffh,0ffh
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
-	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
-	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh 
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh 
 	BYTE 049h,049h,049h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 
+;; SPRITE STRUCTS
+ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0>
+FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
 
-
-
+boomStr BYTE "Boom!", 0
+testStr BYTE "Test!", 0
+instructionStr BYTE "Press up/down arrow key to move the fighter jet!", 0
 
 .CODE
 
-GameInit PROC uses ecx edi esi
-	mov ecx, OFFSET asteroid_000 
-	mov edi, 200
-	mov esi, 200
-	INVOKE RotateBlit, ecx, 300, 200, 0
+;; Clears the screen
+ClearScreen PROC uses ecx  edx
+	mov eax, 640
+	imul eax, 480
+	mov ecx, 0
+	mov edx, ScreenBitsPtr
+clearingScreen:
+	cmp ecx, eax
+	jge doneClearing
+	mov BYTE PTR [edx], 000h
+	add ecx, 1
+	add edx, 1
+	jmp clearingScreen
+doneClearing:
+	ret
+ClearScreen ENDP
 
-	mov ecx, OFFSET fighter_000
-	mov edi, 350
-	mov esi, 300
-	INVOKE RotateBlit, ecx, 350, 300, 0
+
+;;; Draws all sprites on the screen
+DrawAllSprites PROC uses ecx
+	mov ecx, OFFSET ASTEROID_0
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	mov ecx, OFFSET FIGHTER
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	ret
+DrawAllSprites ENDP
+
+
+GameInit PROC uses ecx edi esi
+	INVOKE DrawStarField
+	INVOKE DrawAllSprites
 	ret         ;; Do not delete this line!!!
 GameInit ENDP
 
 
 GamePlay PROC uses ecx
-	INVOKE DownArrowOn
+	INVOKE ClearScreen ;; Clear the screen first
+	INVOKE DrawStarField ;; Draw da stars
+	INVOKE DrawStr, offset instructionStr, 80, 10, 0ffh
+
+;	INVOKE CheckCollision ;; Check if any collision 
+	
+
+	INVOKE SpaceOn	;; Check if the user pressed space
+	cmp eax, 0
+	jl CHECK_ARROWS
+	INVOKE DrawStr, offset boomStr, 20, 20, 0ffh
+	;INVOKE DrawAllSprites
+
+CHECK_ARROWS:
+	INVOKE UpArrowOn ;; Check if the user pressed up key
+	cmp eax, 0
+	jl CHECK_DOWNKEY
+	INVOKE MoveUp, OFFSET FIGHTER ;; Move the jet up
+
+CHECK_DOWNKEY:
+	INVOKE DownArrowOn ;; Check if the user pressed down key
+	cmp eax, 0
+	jl CHECK_LEFTKEY
+	INVOKE MoveDown, OFFSET FIGHTER ;; Move the thing down
+
+CHECK_LEFTKEY:
+	INVOKE LeftArrowOn ;; Check if the user pressed left key
+	cmp eax, 0
+	jl CHECK_RIGHTKEY
+	INVOKE MoveLeft, OFFSET FIGHTER ;; Move the thing left
+
+CHECK_RIGHTKEY:
+	INVOKE RightArrowOn ;; Check if the user pressed right key
 	cmp eax, 0
 	jl GAME_END
-	mov ecx, OFFSET fighter_000
-	INVOKE RotateBlit, ecx, 350, 300, 00020000h
+	INVOKE MoveRight, OFFSET FIGHTER ;; Move the thing right
+
 GAME_END:
+	INVOKE DrawAllSprites
 	ret         ;; Do not delete this line!!!
 GamePlay ENDP
-	
+
+
 
 END

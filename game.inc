@@ -12,14 +12,20 @@ MouseInfo STRUCT
  buttons DWORD ?
 MouseInfo ENDS
 
+BMPPTR TYPEDEF PTR EECS205BITMAP
 
-;; Sprite Struct : Defines x,y coordinates and rotation of a sprite
-SPRITEINFO STRUCT
- obj 
- x_coord DWORD ?
- y_coord DWORD ?
- rotation FXPT ?
-SPRITEINFO ENDS
+;; Sprite Struct : Keeps track of x,y coordinates and rotation of a sprite
+_SPRITE STRUCT
+ obj BMPPTR ?  			; pointer to the bitmap data
+ x_coord DWORD ? 		; the x-coordinate location
+ y_coord DWORD ?		; the y-coordinate location
+ rotation FXPT ?		; rotation in fxpt angle
+ wide DWORD ?			; the width in px
+ height DWORD ?			; the height in px
+_SPRITE ENDS	
+
+SPRITE TYPEDEF _SPRITE
+SPRITE_PTR TYPEDEF PTR SPRITE
 
 MK_CONTROL  = 0008h  ;; The CTRL key is down.
 MK_LBUTTON  = 0001h  ;; The left mouse button is down.
@@ -47,6 +53,3 @@ EXTERNDEF KeyPress:DWORD
 ;; User Defined Functions
 GameInit PROTO
 GamePlay PROTO
-
-
-
