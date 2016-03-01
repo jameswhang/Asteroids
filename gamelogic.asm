@@ -102,21 +102,33 @@ UpArrowOff ENDP
 ;; Moves a sprite up
 MoveUp PROC uses ecx sprite:DWORD
 	mov ecx, sprite
+	mov eax, (SPRITE PTR [ecx]).y_coord
+	cmp eax, 0
+	jle AtTopEdge
 	sub (SPRITE PTR [ecx]).y_coord, 10
+AtTopEdge:
 	ret
 MoveUp ENDP
 
 ;; Moves a sprite down
 MoveDown PROC uses ecx sprite:DWORD
 	mov ecx, sprite
+	mov eax, (SPRITE PTR [ecx]).y_coord
+	cmp eax, 450
+	jge AtBottomEdge
 	add (SPRITE PTR [ecx]).y_coord, 10
+AtBottomEdge:
 	ret
 MoveDown ENDP
 
 ;; Moves a sprite left
 MoveLeft PROC uses ecx sprite:DWORD
 	mov ecx, sprite
+	mov eax, (SPRITE PTR [ecx]).x_coord
+	cmp eax, 0 ;; Make sure I'm not going over the line
+	jle AtLeftEdge
 	sub (SPRITE PTR[ecx]).x_coord, 10
+AtLeftEdge:
 	ret
 MoveLeft ENDP
 
@@ -124,7 +136,7 @@ MoveLeft ENDP
 MoveRight PROC uses ecx sprite:DWORD
 	mov ecx, sprite
 	mov eax, (SPRITE PTR [ecx]).x_coord
-	cmp eax, 640
+	cmp eax, 640 ;; Make sure I'm not going over the line
 	jge AtRightEdge
 	add (SPRITE PTR[ecx]).x_coord, 10
 AtRightEdge:
@@ -134,9 +146,16 @@ MoveRight ENDP
 ;; Rotates a sprite in clockwise direction
 RotateRight PROC uses edx sprite:PTR EECS205BITMAP
 	mov eax, sprite
-	add (SPRITE PTR [eax]).rotation, 0001000h
+	add (SPRITE PTR [eax]).rotation, 00001000h
 	ret
 RotateRight ENDP
+
+;; Rotates a sprite in anticlockwise direction
+RotateLeft PROC uses edx sprite:PTR EECS205BITMAP
+	mov eax, sprite
+	sub (SPRITE PTR [eax]).rotation, 00001000h
+	ret
+RotateLeft ENDP
 
 ;; Checks if there's any collisions
 CheckCollision PROC fighter:PTR EECS205BITMAP, asteroid1:PTR EECS205BITMAP, asteroid2:PTR EECS205BITMAP
