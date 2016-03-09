@@ -220,7 +220,5 @@ CheckCollision PROC obj1: PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 	ret
 CheckCollision ENDP
 
-;; Launches a missile
-
 
 END

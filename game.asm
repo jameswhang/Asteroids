@@ -25,7 +25,36 @@ includelib \masm32\lib\masm32.lib
 	
 .DATA
 ;; If you need to, you can place global variables here
-
+nuke_002 EECS205BITMAP <22, 21, 255,, offset nuke_002 + sizeof nuke_002>
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch
+	BYTE 01ch,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 01ch,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch
+	BYTE 01ch,01ch,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh
+	BYTE 0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,01ch,01ch,01ch
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch
+	BYTE 01ch,01ch,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh
+	BYTE 01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 01ch,01ch,01ch,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,01ch,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,01ch,01ch,01ch,01ch,01ch,01ch,01ch
+	BYTE 01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,01ch,01ch,01ch,01ch,01ch,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 fighter_000 EECS205BITMAP <44, 37, 255,, offset fighter_000 + sizeof fighter_000>
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 	BYTE 0ffh,0ffh,0ffh,0ffh,049h,0b6h,049h,049h,024h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
@@ -388,6 +417,7 @@ asteroid_001 EECS205BITMAP <32, 32, 255,, offset asteroid_001 + sizeof asteroid_
 ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0, 18, 16>
 ASTEROID_1 SPRITE <offset asteroid_001, 400, 150, 0, 16, 16>
 FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
+NUKE SPRITE <offset nuke_002, 0, 0, 0, 0, 0>
 
 ;; Some game-related boolean values
 isDead BYTE 0 ;; Checks if there was a collision
@@ -395,6 +425,7 @@ doRotate BYTE 1 ;; This rotates the asteroids
 gameStarted BYTE 0 ;; Sets to 1 if user does anything
 gamePaused BYTE 0 ;; Sets to 1 if the user presses 1
 gameOverSoundPlayed BYTE 0;
+nukeLaunched BYTE 0;
 
 ;; Some game-related dword values
 currentScore DWORD 0	;; Score for the game
@@ -431,6 +462,24 @@ doneClearing:
 	ret
 ClearScreen ENDP
 
+;; Draws a nuke on the screen
+DrawNuke PROC
+	cmp nukeLaunched, 1
+	jne DONENUKE
+	mov ecx, OFFSET NUKE
+	sub (SPRITE PTR [ecx]).y_coord, 10
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR[ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+
+	;; Check if the nuke went out of screen
+	;; if so, make nuke disappear
+	mov eax, (SPRITE PTR [ecx]).y_coord
+	cmp eax, 0
+	jg DONENUKE
+	mov nukeLaunched, 0
+	
+DONENUKE:
+	ret
+DrawNuke ENDP
 
 ;;; Draws all sprites on the screen
 DrawAllSprites PROC uses ecx
@@ -440,8 +489,24 @@ DrawAllSprites PROC uses ecx
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 	mov ecx, OFFSET FIGHTER
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	INVOKE DrawNuke
 	ret
 DrawAllSprites ENDP
+
+
+LaunchNuke PROC
+	cmp nukeLaunched, 1
+	je NUKEDONE
+	mov ecx, OFFSET FIGHTER
+	mov edx, OFFSET NUKE
+	mov eax, (SPRITE PTR [ecx]).x_coord
+	mov (SPRITE PTR [edx]).x_coord, eax
+	mov eax, (SPRITE PTR [ecx]).y_coord
+	mov (SPRITE PTR [edx]).y_coord, eax
+	mov nukeLaunched, 1
+NUKEDONE:
+	ret
+LaunchNuke ENDP
 
 
 GameInit PROC uses ecx edi esi
@@ -512,6 +577,7 @@ CHECK_SPACE:
 	jl CHECK_ARROWS
 	mov gameStarted, 1
 	INVOKE DrawStr, offset boomStr, 20, 20, 0ffh
+	INVOKE LaunchNuke
 
 CHECK_ARROWS:
 	INVOKE UpArrowOn ;; Check if the user pressed up key
