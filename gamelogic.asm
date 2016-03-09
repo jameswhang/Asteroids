@@ -225,7 +225,7 @@ CheckCollision ENDP
 ;;	25 <= dir < 50 : Right
 ;;	50 <= dir < 75 : Top
 ;;	75 <= dir < 100 : Bottom
-MoveAsteroid PROC PROC obj: PTR EECS205BITMAP, dir: DWORD
+MoveAsteroid PROC obj: PTR EECS205BITMAP, dir: DWORD
 	mov eax, dir
 	mov ecx, obj
 	cmp eax, 25
@@ -247,4 +247,36 @@ BOTTOM:
 DONEMOVINGASTEROID:
 	ret
 MoveAsteroid ENDP
+
+
+;; LevelUp
+LevelUp PROC score:DWORD
+	cmp score, 500
+	jge LEVEL2
+	mov eax, 1
+	jmp LEVELUPDONE
+LEVEL2:
+	cmp score, 1000
+	jge LEVEL3
+	mov eax, 2
+	jmp LEVELUPDONE
+LEVEL3:
+	cmp score, 2000
+	jge LEVEL4
+	mov eax, 3
+	jmp LEVELUPDONE
+LEVEL4:
+	cmp score, 4000
+	jge LEVEL5
+	mov eax, 4
+	jmp LEVELUPDONE
+LEVEL5:
+	cmp score, 8000
+	mov eax, 5
+	jmp LEVELUPDONE
+LEVELUPDONE:
+	ret
+
+LevelUp ENDP
+
 END

@@ -438,8 +438,8 @@ boomStr BYTE "Boom!", 0
 deadStr BYTE "GAME OVER!", 0
 scoreFmtStr BYTE "score: %d", 0
 scoreOutStr BYTE 256 DUP(0)
-timeFmtStr BYTE "time: %d", 0
-timeOutStr BYTE 256 DUP(0)
+levelFmtStr BYTE "level: %d", 0
+levelOutStr BYTE 256 DUP(0)
 stopRotateStr BYTE "You don't like these little asteroids moving???", 0
 stopRotateInstStr BYTE "Click left button on mouse to keep them still!", 0
 keepRotateInstStr BYTE "Click right button on mouse to keep them moving!", 0
@@ -530,12 +530,13 @@ DrawScore PROC
 	call wsprintf
 	add esp, 12
 	invoke DrawStr, offset scoreOutStr, 80, 10, 0ffh
+	mov eax, currentLevel
 	push eax
-	push offset timeFmtStr
-	push offset timeOutStr
+	push offset levelFmtStr
+	push offset levelOutStr
 	call wsprintf
 	add esp, 12
-	invoke DrawStr, offset timeOutStr, 80, 25, 0ffh
+	invoke DrawStr, offset levelOutStr, 80, 25, 0ffh
 
 DrawScore ENDP
 
@@ -591,7 +592,8 @@ CHECKNUKE:
 	cmp eax, 0
 	je NOCOL
 	add currentScore, 100 ;; If hit an asteroid, get 100
-
+	INVOKE LevelUp, currentScore
+	mov currentLevel, eax
 NOCOL:
 	INVOKE MoveAsteroids
 
