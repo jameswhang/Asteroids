@@ -220,5 +220,31 @@ CheckCollision PROC obj1: PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 	ret
 CheckCollision ENDP
 
-
+;; Move one asteroid in specified direction
+;; 	0 <= dir < 25 : Left
+;;	25 <= dir < 50 : Right
+;;	50 <= dir < 75 : Top
+;;	75 <= dir < 100 : Bottom
+MoveAsteroid PROC PROC obj: PTR EECS205BITMAP, dir: DWORD
+	mov eax, dir
+	mov ecx, obj
+	cmp eax, 25
+	jge RIGHT
+	sub (SPRITE PTR [ecx]).x_coord, 10
+	jmp DONEMOVINGASTEROID
+RIGHT:
+	cmp eax, 50
+	jge TOP
+	add (SPRITE PTR [ecx]).x_coord, 10
+	jmp DONEMOVINGASTEROID
+TOP:
+	cmp eax, 75
+	jge BOTTOM
+	sub (SPRITE PTR [ecx]).y_coord, 10
+	jmp DONEMOVINGASTEROID
+BOTTOM:
+	add (SPRITE PTR [ecx]).y_coord, 10
+DONEMOVINGASTEROID:
+	ret
+MoveAsteroid ENDP
 END

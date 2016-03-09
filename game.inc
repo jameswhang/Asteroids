@@ -55,3 +55,4 @@ EXTERNDEF KeyPress:DWORD
 GameInit PROTO
 GamePlay PROTO
 IsGameOver PROTO
+DidNukeHit PROTO

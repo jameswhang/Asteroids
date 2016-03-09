@@ -19,6 +19,7 @@ RightArrowOn proto
 PauseGame proto
 
 CheckCollision proto obj:PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
+MoveAsteroid proto obj:PTR EECS205BITMAP, dir: DWORD
 
 RotateLeft proto sprite:DWORD
 RotateRight proto sprite:PTR EECS205BITMAP

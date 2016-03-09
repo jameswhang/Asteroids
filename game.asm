@@ -20,6 +20,8 @@ include keys.inc
 include \masm32\include\windows.inc
 include \masm32\include\masm32.inc
 include \masm32\include\winmm.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\user32.lib
 includelib \masm32\lib\winmm.lib
 includelib \masm32\lib\masm32.lib
 	
@@ -434,6 +436,10 @@ currentLevel DWORD 1	;; "stage" of the game
 ;; Strings that appear in the game
 boomStr BYTE "Boom!", 0
 deadStr BYTE "GAME OVER!", 0
+scoreFmtStr BYTE "score: %d", 0
+scoreOutStr BYTE 256 DUP(0)
+timeFmtStr BYTE "time: %d", 0
+timeOutStr BYTE 256 DUP(0)
 stopRotateStr BYTE "You don't like these little asteroids moving???", 0
 stopRotateInstStr BYTE "Click left button on mouse to keep them still!", 0
 keepRotateInstStr BYTE "Click right button on mouse to keep them moving!", 0
@@ -442,6 +448,7 @@ instructionStr BYTE "Press the arrow keys to move the fighter jet around!", 0
 
 ;; Sounds
 UpsetSoundPath BYTE "upset.wav", 0
+BombSoundPath BYTE "bomb.wav", 0
 
 .CODE
 
@@ -462,12 +469,21 @@ doneClearing:
 	ret
 ClearScreen ENDP
 
+;; Move all asteroids in a random direction
+MoveAsteroids PROC USES ecx
+	INVOKE nrandom, 100
+	INVOKE MoveAsteroid, OFFSET ASTEROID_0, eax
+	INVOKE nrandom, 100
+	INVOKE MoveAsteroid, OFFSET ASTEROID_1, eax
+	ret
+MoveAsteroids ENDP
+
 ;; Draws a nuke on the screen
 DrawNuke PROC
 	cmp nukeLaunched, 1
 	jne DONENUKE
 	mov ecx, OFFSET NUKE
-	sub (SPRITE PTR [ecx]).y_coord, 10
+	sub (SPRITE PTR [ecx]).y_coord, 5
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR[ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 
 	;; Check if the nuke went out of screen
@@ -476,7 +492,6 @@ DrawNuke PROC
 	cmp eax, 0
 	jg DONENUKE
 	mov nukeLaunched, 0
-	
 DONENUKE:
 	ret
 DrawNuke ENDP
@@ -493,7 +508,6 @@ DrawAllSprites PROC uses ecx
 	ret
 DrawAllSprites ENDP
 
-
 LaunchNuke PROC
 	cmp nukeLaunched, 1
 	je NUKEDONE
@@ -508,6 +522,22 @@ NUKEDONE:
 	ret
 LaunchNuke ENDP
 
+DrawScore PROC
+	mov eax, currentScore
+	push eax
+	push offset scoreFmtStr
+	push offset scoreOutStr
+	call wsprintf
+	add esp, 12
+	invoke DrawStr, offset scoreOutStr, 80, 10, 0ffh
+	push eax
+	push offset timeFmtStr
+	push offset timeOutStr
+	call wsprintf
+	add esp, 12
+	invoke DrawStr, offset timeOutStr, 80, 25, 0ffh
+
+DrawScore ENDP
 
 GameInit PROC uses ecx edi esi
 	INVOKE DrawStarField
@@ -516,7 +546,6 @@ GameInit PROC uses ecx edi esi
 	INVOKE nseed, eax
 	ret    
 GameInit ENDP
-
 
 GamePlay PROC uses ecx
 	INVOKE ClearScreen ;; Clear the screen first
@@ -552,10 +581,21 @@ NOROTATE:
 	;; Check if any collision 
   	INVOKE IsGameOver
 	cmp eax, 0
-	je NOCOL
+	je CHECKNUKE
 	mov isDead, 1
 	jmp GAME_END
+
+CHECKNUKE:
+	add currentScore, 1 ;; Default add 1 per loop
+	INVOKE DidNukeHit
+	cmp eax, 0
+	je NOCOL
+	add currentScore, 100 ;; If hit an asteroid, get 100
+
 NOCOL:
+	INVOKE MoveAsteroids
+
+CHECK_LMOUSE:
 	INVOKE LeftMouseOn ; Check if the user pressed left mouse btn 
 	cmp eax, 0
 	jne CHECK_RMOUSE
@@ -617,6 +657,7 @@ DEAD:
 	mov gameOverSoundPlayed, 1
 GAME_END:
 	INVOKE DrawAllSprites
+	INVOKE DrawScore
 	ret         ;; Do not delete this line!!!
 GamePlay ENDP
 
@@ -634,4 +675,17 @@ GameOver:
 	ret
 IsGameOver ENDP
 
+
+;; Checks if the nuke hit
+DidNukeHit PROC
+	INVOKE CheckCollision, OFFSET NUKE, OFFSET ASTEROID_0
+	cmp eax, 0
+	jl NukeHit
+	INVOKE CheckCollision, OFFSET NUKE, OFFSET ASTEROID_1
+	cmp eax, 0
+	jl NukeHit
+	mov eax, 0
+NukeHit:
+	ret
+DidNukeHit ENDP
 END
