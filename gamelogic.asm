@@ -18,11 +18,10 @@ include keys.inc
 include game.inc
 
 .DATA
-ASTEROID_0_POS EECS205RECT <172, 226, 228, 174>
-ASTEROID_1_POS EECS205RECT <384, 166, 416, 134>
-FIGHTER_POS EECS205RECT <328, 319, 372, 281>
 
-
+;; Temporary EECS205RECT Structs used in CheckCollision
+OBJ1_POS EECS205RECT <0, 0, 0, 0>
+OBJ2_POS EECS205RECT <0, 0, 0, 0>
 
 .CODE
 ;; Returns 0 if the user is pressing left mouse key, -1 otherwise
@@ -182,69 +181,31 @@ RotateLeft PROC uses edx sprite:PTR EECS205BITMAP
 	ret
 RotateLeft ENDP
 
-;; Checks if there's any collisions. Returns -1 if there's a collision. 0 otherwise
-CheckCollision PROC fighter:PTR EECS205BITMAP, asteroid0:PTR EECS205BITMAP, asteroid1:PTR EECS205BITMAP
+;; Updates positions of sprites
+CalculatePosition PROC sprite:PTR EECS205BITMAP, pos: PTR EECS205RECT
+	mov eax, sprite
+	mov ecx, pos
+	mov edx, (SPRITE PTR [eax]).x_coord
+	mov edi, (SPRITE PTR [eax]).wide
+	mov (EECS205RECT PTR [ecx]).dwLeft, edx
+	mov (EECS205RECT PTR [ecx]).dwRight, edx
+	sub (EECS205RECT PTR [ecx]).dwLeft, edi
+	add (EECS205RECT PTR [ecx]).dwRight, edi
 
-	;; First update the positions of all SPRITEs
-	mov eax, fighter
-	mov edx, (SPRITE ptr [eax]).x_coord
-	mov edi, (SPRITE ptr [eax]).wide
-	mov FIGHTER_POS.dwLeft, edx
-	mov FIGHTER_POS.dwRight, edx
-	sub FIGHTER_POS.dwLeft, edi
-	add FIGHTER_POS.dwRight, edi
-	
 	mov edx, (SPRITE ptr [eax]).y_coord
 	mov edi, (SPRITE ptr [eax]).height
-	mov FIGHTER_POS.dwTop, edx
-	mov FIGHTER_POS.dwBottom, edx
-	sub FIGHTER_POS.dwTop, edi
-	add FIGHTER_POS.dwBottom, edi 
-	
-	mov eax, asteroid0
-	mov edx, (SPRITE ptr [eax]).x_coord
-	mov edi, (SPRITE ptr [eax]).wide
-	mov ASTEROID_0_POS.dwLeft, edx
-	mov ASTEROID_0_POS.dwRight, edx
-	sub ASTEROID_0_POS.dwLeft, edi
-	add ASTEROID_0_POS.dwRight, edi
-	
-	mov edx, (SPRITE ptr [eax]).y_coord
-	mov edi, (SPRITE ptr [eax]).height
-	mov ASTEROID_0_POS.dwTop, edx
-	mov ASTEROID_0_POS.dwBottom, edx
-	sub ASTEROID_0_POS.dwTop, edi
-	add ASTEROID_0_POS.dwBottom, edi 
-
-	mov eax, asteroid1
-	mov edx, (SPRITE ptr [eax]).x_coord
-	mov edi, (SPRITE ptr [eax]).wide
-	mov ASTEROID_1_POS.dwLeft, edx
-	mov ASTEROID_1_POS.dwRight, edx
-	sub ASTEROID_1_POS.dwLeft, edi
-	add ASTEROID_1_POS.dwRight, edi
-	
-	mov edx, (SPRITE ptr [eax]).y_coord
-	mov edi, (SPRITE ptr [eax]).height
-	mov ASTEROID_1_POS.dwTop, edx
-	mov ASTEROID_1_POS.dwBottom, edx
-	sub ASTEROID_1_POS.dwTop, edi
-	add ASTEROID_1_POS.dwBottom, edi 
-
-
-	;; Use CheckIntersectRect to see if there was any collision
-
-	INVOKE CheckIntersectRect, OFFSET FIGHTER_POS, OFFSET ASTEROID_0_POS
-	cmp eax, 0
-	jl COLLIDES
-
-	INVOKE CheckIntersectRect, OFFSET FIGHTER_POS, OFFSET ASTEROID_1_POS
-
-COLLIDES:
+	mov (EECS205RECT PTR [ecx]).dwTop, edx
+	mov (EECS205RECT PTR [ecx]).dwBottom, edx
+	sub (EECS205RECT PTR [ecx]).dwTop, edi
+	add (EECS205RECT PTR [ecx]).dwBottom, edi 
 	ret
+CalculatePosition ENDP
 
+;; Checks if there's any collisions. Returns -1 if there's a collision. 0 otherwise
+CheckCollision PROC obj1: PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
+	INVOKE CalculatePosition, obj1, OFFSET OBJ1_POS
+	INVOKE CalculatePosition, obj2, OFFSET OBJ2_POS
+	INVOKE CheckIntersectRect, OFFSET OBJ1_POS, OFFSET OBJ2_POS
+	ret
 CheckCollision ENDP
-
-
-
 END

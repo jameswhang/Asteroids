@@ -16,7 +16,7 @@ UpArrowOff proto
 LeftArrowOn proto
 RightArrowOn proto
 
-
+CheckCollision proto obj:PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 
 RotateLeft proto sprite:DWORD
 RotateRight proto sprite:PTR EECS205BITMAP
@@ -25,4 +25,3 @@ MoveDown proto sprite:DWORD
 MoveRight proto sprite:DWORD
 MoveLeft proto sprite:DWORD
 
-CheckCollision proto fighter:PTR EECS205BITMAP, asteroid0:PTR EECS205BITMAP, asteroid1:PTR EECS205BITMAP

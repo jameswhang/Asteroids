@@ -458,7 +458,7 @@ GAMESTARTED:
 
 NOROTATE:
 	;; Check if any collision 
-	INVOKE CheckCollision, offset FIGHTER, offset ASTEROID_0, offset ASTEROID_1
+  	INVOKE IsGameOver
 	cmp eax, 0
 	je NOCOL
 	mov isDead, 1
@@ -524,5 +524,17 @@ GAME_END:
 GamePlay ENDP
 
 
+;; Checks if the game is over 
+IsGameOver PROC 
+	INVOKE CheckCollision, OFFSET FIGHTER, OFFSET ASTEROID_0
+	cmp eax, 0
+	jl GameOver
+	INVOKE CheckCollision, OFFSET FIGHTER, OFFSET ASTEROID_1
+	cmp eax, 0
+	jl GameOver
+	mov eax, 0
+GameOver:
+	ret
+IsGameOver ENDP
 
 END
