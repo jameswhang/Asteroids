@@ -1,6 +1,6 @@
 ; #########################################################################
 ;
-;   game.asm - Assembly file for EECS205 Assignment 4/5
+;   game.asm - Assembly file for EECS205 Assignment 5/5
 ;   Author: James Whang (syw973)
 ;           sungyoonwhang2017@u.northwestern.edu
 ;
@@ -17,6 +17,11 @@ include blit.inc
 include game.inc
 include gamelogic.inc
 include keys.inc
+include \masm32\include\windows.inc
+include \masm32\include\masm32.inc
+include \masm32\include\winmm.inc
+includelib \masm32\lib\winmm.lib
+includelib \masm32\lib\masm32.lib
 	
 .DATA
 ;; If you need to, you can place global variables here
@@ -388,7 +393,12 @@ FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
 isDead BYTE 0 ;; Checks if there was a collision
 doRotate BYTE 1 ;; This rotates the asteroids
 gameStarted BYTE 0 ;; Sets to 1 if user does anything
+gamePaused BYTE 0 ;; Sets to 1 if the user presses 1
+gameOverSoundPlayed BYTE 0;
 
+;; Some game-related dword values
+currentScore DWORD 0	;; Score for the game
+currentLevel DWORD 1	;; "stage" of the game
 
 ;; Strings that appear in the game
 boomStr BYTE "Boom!", 0
@@ -398,6 +408,9 @@ stopRotateInstStr BYTE "Click left button on mouse to keep them still!", 0
 keepRotateInstStr BYTE "Click right button on mouse to keep them moving!", 0
 keepRotateStr BYTE "You don't like these little asteroids staying still???", 0
 instructionStr BYTE "Press the arrow keys to move the fighter jet around!", 0
+
+;; Sounds
+UpsetSoundPath BYTE "upset.wav", 0
 
 .CODE
 
@@ -434,13 +447,15 @@ DrawAllSprites ENDP
 GameInit PROC uses ecx edi esi
 	INVOKE DrawStarField
 	INVOKE DrawAllSprites
+	rdtsc
+	INVOKE nseed, eax
 	ret    
 GameInit ENDP
 
 
 GamePlay PROC uses ecx
 	INVOKE ClearScreen ;; Clear the screen first
-	INVOKE DrawStarField ;; Draw da stars
+	INVOKE DrawStarField ;; Draw da star
 
 	cmp gameStarted, 0
 	jnz GAMESTARTED
@@ -449,10 +464,22 @@ GamePlay PROC uses ecx
 GAMESTARTED:
 	cmp isDead, 0
 	jnz DEAD
-	
+
+CHECKPAUSE:
+	INVOKE PauseGame
+	cmp eax, 0
+	je PAUSE
+	not gamePaused
+	not doRotate
+PAUSE:
+	cmp gamePaused, 1
+	jne CHECKROTATE
+	INVOKE ClearScreen
+	jmp GAME_END
+
+CHECKROTATE:
 	cmp doRotate, 0
 	je NOROTATE
-
 	INVOKE RotateRight, offset ASTEROID_0
 	INVOKE RotateLeft, offset ASTEROID_1
 
@@ -517,7 +544,11 @@ CHECK_RIGHTKEY:
 
 DEAD:
 	INVOKE DrawStr, offset deadStr, 280, 150, 0ffh ;; Dispay game over string
-
+	;; Upset user
+	cmp gameOverSoundPlayed, 1
+	je GAME_END
+	INVOKE PlaySound, OFFSET UpsetSoundPath, 0, SND_FILENAME
+	mov gameOverSoundPlayed, 1
 GAME_END:
 	INVOKE DrawAllSprites
 	ret         ;; Do not delete this line!!!

@@ -1,6 +1,6 @@
 ; #########################################################################
 ;
-;   gamelogic.asm - Assembly file for EECS205 Assignment 4/5
+;   gamelogic.asm - Assembly file for EECS205 Assignment 5/5
 ;   Author: James Whang (syw973)
 ;           sungyoonwhang2017@u.northwestern.edu
 ;
@@ -78,6 +78,17 @@ DownArrowOff PROC uses ecx esi edi
 TRUE:
 	ret
 DownArrowOff ENDP
+
+;; Returns 0 if the user pressed the p key
+PauseGame PROC 
+	mov eax, 0
+	mov ecx, KeyDown
+	cmp ecx, VK_P
+	je TRUE
+	mov eax, -1
+TRUE:
+	ret
+PauseGame ENDP
 
 ;; RETURNS 0 if the user is pressing up arrow key, -1 otherwise
 UpArrowOn PROC uses ecx esi edi
@@ -208,4 +219,8 @@ CheckCollision PROC obj1: PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 	INVOKE CheckIntersectRect, OFFSET OBJ1_POS, OFFSET OBJ2_POS
 	ret
 CheckCollision ENDP
+
+;; Launches a missile
+
+
 END

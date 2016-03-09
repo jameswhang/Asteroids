@@ -1,6 +1,6 @@
 ; #########################################################################
 ;
-;   gamelogic.inc - Includes for EECS205 Assignment 4/5
+;   gamelogic.inc - Includes for EECS205 Assignment 5/5
 ;
 ;
 ; #########################################################################
@@ -15,6 +15,8 @@ UpArrowOn proto
 UpArrowOff proto
 LeftArrowOn proto
 RightArrowOn proto
+
+PauseGame proto
 
 CheckCollision proto obj:PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 
