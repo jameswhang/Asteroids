@@ -20,6 +20,7 @@ PauseGame proto
 
 CheckCollision proto obj:PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
 MoveAsteroid proto obj:PTR EECS205BITMAP, dir: DWORD
+CalculateTrajectory proto fighter:PTR EECS205BITMAP, asteroid: PTR EECS205BITMAP
 LevelUp proto score:DWORD
 
 RotateLeft proto sprite:DWORD

@@ -415,9 +415,23 @@ asteroid_001 EECS205BITMAP <32, 32, 255,, offset asteroid_001 + sizeof asteroid_
 	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,091h,091h,049h
 	BYTE 049h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 
+asteroid_002 EECS205BITMAP <13, 14, 255,, offset asteroid_002 + sizeof asteroid_002>
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,049h,024h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,049h,049h
+	BYTE 049h,024h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,049h,091h,049h,024h,024h,024h
+	BYTE 024h,0ffh,0ffh,0ffh,0ffh,0ffh,091h,091h,0b6h,091h,049h,024h,024h,024h,024h,024h
+	BYTE 0ffh,0ffh,091h,0b6h,0b6h,091h,091h,091h,049h,049h,024h,049h,024h,024h,0ffh,091h
+	BYTE 0b6h,091h,091h,091h,0b6h,091h,091h,049h,049h,049h,024h,0ffh,091h,0b6h,0b6h,091h
+	BYTE 049h,091h,0b6h,091h,049h,024h,049h,024h,0ffh,0ffh,091h,0b6h,0b6h,091h,049h,091h
+	BYTE 049h,049h,024h,024h,024h,0ffh,0ffh,091h,0b6h,0b6h,0b6h,091h,091h,091h,049h,049h
+	BYTE 024h,024h,0ffh,0ffh,0ffh,091h,091h,0b6h,0b6h,0b6h,091h,091h,091h,091h,024h,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,091h,091h,0b6h,0b6h,0b6h,049h,049h,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,091h,091h,091h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+	BYTE 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
 ;; SPRITE STRUCTS
 ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0, 18, 16>
 ASTEROID_1 SPRITE <offset asteroid_001, 400, 150, 0, 16, 16>
+ASTEROID_2 SPRITE <offset asteroid_002, 140, 50, 0, 18, 16>
 FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
 NUKE SPRITE <offset nuke_002, 0, 0, 0, 0, 0>
 
@@ -478,6 +492,13 @@ MoveAsteroids PROC USES ecx
 	ret
 MoveAsteroids ENDP
 
+DrawSpecialAsteroid PROC uses ecx
+	INVOKE CalculateTrajectory, OFFSET FIGHTER, OFFSET ASTEROID_2
+	mov ecx, OFFSET ASTEROID_2
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	ret
+DrawSpecialAsteroid ENDP
+
 ;; Draws a nuke on the screen
 DrawNuke PROC
 	cmp nukeLaunched, 1
@@ -505,6 +526,13 @@ DrawAllSprites PROC uses ecx
 	mov ecx, OFFSET FIGHTER
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 	INVOKE DrawNuke
+
+	;; At level 5, special asteroid appears
+	cmp currentLevel, 1
+	jl DONEDRAWING
+	INVOKE DrawSpecialAsteroid
+
+DONEDRAWING:
 	ret
 DrawAllSprites ENDP
 
@@ -563,9 +591,8 @@ GAMESTARTED:
 CHECKPAUSE:
 	INVOKE PauseGame
 	cmp eax, 0
-	je PAUSE
-	not gamePaused
-	not doRotate
+	jne CHECKROTATE
+	mov gamePaused, 1
 PAUSE:
 	cmp gamePaused, 1
 	jne CHECKROTATE

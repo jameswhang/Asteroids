@@ -279,4 +279,20 @@ LEVELUPDONE:
 
 LevelUp ENDP
 
+
+;; Calculates trajectory for special asteroid
+CalculateTrajectory PROC USES ecx esi edi fighter: PTR EECS205BITMAP, asteroid: PTR EECS205BITMAP
+	mov eax, fighter
+	mov ecx, asteroid
+	mov esi, (SPRITE PTR [eax]).y_coord
+	mov edi, (SPRITE PTR [ecx]).y_coord
+	sub esi, eax
+	add (SPRITE PTR [ecx]).y_coord, esi
+
+	mov esi, (SPRITE PTR [eax]).x_coord
+	mov edi, (SPRITE PTR [ecx]).x_coord
+	sub esi, eax
+	add (SPRITE PTR [ecx]).x_coord, esi
+	ret
+CalculateTrajectory ENDP
 END
