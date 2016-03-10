@@ -431,7 +431,8 @@ asteroid_002 EECS205BITMAP <13, 14, 255,, offset asteroid_002 + sizeof asteroid_
 ;; SPRITE STRUCTS
 ASTEROID_0 SPRITE <offset asteroid_000, 200, 200, 0, 18, 16>
 ASTEROID_1 SPRITE <offset asteroid_001, 400, 150, 0, 16, 16>
-ASTEROID_2 SPRITE <offset asteroid_002, 140, 50, 0, 18, 16>
+ASTEROID_2 SPRITE <offset asteroid_000, 100, 200, 0, 18, 16>
+ASTEROID_3 SPRITE <offset asteroid_001, 180, 50, 0, 16, 16>
 FIGHTER SPRITE <offset fighter_000, 350, 300, 0, 22, 19>
 NUKE SPRITE <offset nuke_002, 0, 0, 0, 0, 0>
 
@@ -442,10 +443,13 @@ gameStarted BYTE 0 ;; Sets to 1 if user does anything
 gamePaused BYTE 0 ;; Sets to 1 if the user presses 1
 gameOverSoundPlayed BYTE 0;
 nukeLaunched BYTE 0;
+lighteningCount DWORD 0 ; used to make lightening effect
+randomAsteroidLaunched BYTE 0 ;used to launch random asteroid
 
 ;; Some game-related dword values
 currentScore DWORD 0	;; Score for the game
 currentLevel DWORD 1	;; "stage" of the game
+gravityHelper DWORD 1 ;; makes random asteroid accelerate
 
 ;; Strings that appear in the game
 boomStr BYTE "Boom!", 0
@@ -459,10 +463,16 @@ stopRotateInstStr BYTE "Click left button on mouse to keep them still!", 0
 keepRotateInstStr BYTE "Click right button on mouse to keep them moving!", 0
 keepRotateStr BYTE "You don't like these little asteroids staying still???", 0
 instructionStr BYTE "Press the arrow keys to move the fighter jet around!", 0
+instructionStr1 BYTE "Press space to shoot gravity-nuke!", 0
+instructionStr2 BYTE "Press p to pause", 0
 
 ;; Sounds
 UpsetSoundPath BYTE "upset.wav", 0
 BombSoundPath BYTE "bomb.wav", 0
+
+;; Other Variables
+blackColor BYTE 000h
+whiteColor BYTE 0ffh
 
 .CODE
 
@@ -489,23 +499,25 @@ MoveAsteroids PROC USES ecx
 	INVOKE MoveAsteroid, OFFSET ASTEROID_0, eax
 	INVOKE nrandom, 100
 	INVOKE MoveAsteroid, OFFSET ASTEROID_1, eax
+	INVOKE nrandom, 100
+	INVOKE MoveAsteroid, OFFSET ASTEROID_2, eax
+	INVOKE nrandom, 100
+	INVOKE MoveAsteroid, OFFSET ASTEROID_3, eax
 	ret
 MoveAsteroids ENDP
-
-DrawSpecialAsteroid PROC uses ecx
-	INVOKE CalculateTrajectory, OFFSET FIGHTER, OFFSET ASTEROID_2
-	mov ecx, OFFSET ASTEROID_2
-	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
-	ret
-DrawSpecialAsteroid ENDP
 
 ;; Draws a nuke on the screen
 DrawNuke PROC
 	cmp nukeLaunched, 1
 	jne DONENUKE
 	mov ecx, OFFSET NUKE
-	sub (SPRITE PTR [ecx]).y_coord, 5
+	mov eax, gravityHelper
+	mov edx, eax
+	mul edx
+	sar eax, 8
+	sub (SPRITE PTR [ecx]).y_coord, eax
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR[ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	add gravityHelper, 1
 
 	;; Check if the nuke went out of screen
 	;; if so, make nuke disappear
@@ -513,6 +525,7 @@ DrawNuke PROC
 	cmp eax, 0
 	jg DONENUKE
 	mov nukeLaunched, 0
+	mov gravityHelper, 1
 DONENUKE:
 	ret
 DrawNuke ENDP
@@ -523,14 +536,13 @@ DrawAllSprites PROC uses ecx
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 	mov ecx, OFFSET ASTEROID_1
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	mov ecx, OFFSET ASTEROID_2
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
+	mov ecx, OFFSET ASTEROID_3
+	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 	mov ecx, OFFSET FIGHTER
 	INVOKE RotateBlit, (SPRITE PTR [ecx]).obj, (SPRITE PTR [ecx]).x_coord, (SPRITE PTR [ecx]).y_coord, (SPRITE PTR [ecx]).rotation
 	INVOKE DrawNuke
-
-	;; At level 5, special asteroid appears
-	cmp currentLevel, 1
-	jl DONEDRAWING
-	INVOKE DrawSpecialAsteroid
 
 DONEDRAWING:
 	ret
@@ -573,7 +585,7 @@ GameInit PROC uses ecx edi esi
 	INVOKE DrawAllSprites
 	rdtsc
 	INVOKE nseed, eax
-	ret    
+	ret 
 GameInit ENDP
 
 GamePlay PROC uses ecx
@@ -582,7 +594,9 @@ GamePlay PROC uses ecx
 
 	cmp gameStarted, 0
 	jnz GAMESTARTED
-	INVOKE DrawStr, offset instructionStr, 80, 10, 0ffh
+	INVOKE DrawStr, offset instructionStr, 80, 400, 0ffh
+	INVOKE DrawStr, offset instructionStr1, 80, 410, 0ffh
+	INVOKE DrawStr, offset instructionStr2, 80, 420, 0ffh
 
 GAMESTARTED:
 	cmp isDead, 0
@@ -699,6 +713,12 @@ IsGameOver PROC
 	INVOKE CheckCollision, OFFSET FIGHTER, OFFSET ASTEROID_1
 	cmp eax, 0
 	jl GameOver
+	INVOKE CheckCollision, OFFSET FIGHTER, OFFSET ASTEROID_2
+	cmp eax, 0
+	jl GameOver
+	INVOKE CheckCollision, OFFSET FIGHTER, OFFSET ASTEROID_3
+	cmp eax, 0
+	jl GameOver
 	mov eax, 0
 GameOver:
 	ret
@@ -711,6 +731,12 @@ DidNukeHit PROC
 	cmp eax, 0
 	jl NukeHit
 	INVOKE CheckCollision, OFFSET NUKE, OFFSET ASTEROID_1
+	cmp eax, 0
+	jl NukeHit
+	INVOKE CheckCollision, OFFSET NUKE, OFFSET ASTEROID_2
+	cmp eax, 0
+	jl NukeHit
+	INVOKE CheckCollision, OFFSET NUKE, OFFSET ASTEROID_3
 	cmp eax, 0
 	jl NukeHit
 	mov eax, 0

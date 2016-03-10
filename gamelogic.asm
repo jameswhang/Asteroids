@@ -80,7 +80,7 @@ TRUE:
 DownArrowOff ENDP
 
 ;; Returns 0 if the user pressed the p key
-PauseGame PROC 
+PauseGame PROC
 	mov eax, 0
 	mov ecx, KeyDown
 	cmp ecx, VK_P
@@ -89,6 +89,17 @@ PauseGame PROC
 TRUE:
 	ret
 PauseGame ENDP
+
+;; Returns 0 if the user pressed l key
+CheckLightening PROC
+	mov eax, 0
+	mov ecx, KeyDown
+	cmp ecx, VK_L
+	je TRUE
+	mov eax, -1 
+TRUE:
+	ret
+CheckLightening ENDP
 
 ;; RETURNS 0 if the user is pressing up arrow key, -1 otherwise
 UpArrowOn PROC uses ecx esi edi
@@ -230,19 +241,32 @@ MoveAsteroid PROC obj: PTR EECS205BITMAP, dir: DWORD
 	mov ecx, obj
 	cmp eax, 25
 	jge RIGHT
+	cmp (SPRITE PTR [ecx]).x_coord, 10 ;; CHECK BOUNDARIES
+	jle NEEDTOMOVERIGHT
+NEEDTOMOVELEFT:
 	sub (SPRITE PTR [ecx]).x_coord, 10
 	jmp DONEMOVINGASTEROID
+NEEDTOMOVERIGHT:
+	mov eax, 50
 RIGHT:
 	cmp eax, 50
 	jge TOP
+	cmp (SPRITE PTR [ecx]).x_coord, 470 ;; Check boundaries
+	jge NEEDTOMOVELEFT
 	add (SPRITE PTR [ecx]).x_coord, 10
 	jmp DONEMOVINGASTEROID
 TOP:
 	cmp eax, 75
 	jge BOTTOM
+	cmp (SPRITE PTR [ecx]).y_coord, 10 ;; Check boundaries
+	jle NEEDTOMOVEBOTTOM
+NEEDTOMOVETOP:
 	sub (SPRITE PTR [ecx]).y_coord, 10
 	jmp DONEMOVINGASTEROID
 BOTTOM:
+	cmp (SPRITE PTR [ecx]).y_coord, 470 ;; Check boundaries
+	jge NEEDTOMOVETOP
+NEEDTOMOVEBOTTOM:
 	add (SPRITE PTR [ecx]).y_coord, 10
 DONEMOVINGASTEROID:
 	ret

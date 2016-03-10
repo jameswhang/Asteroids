@@ -16,6 +16,7 @@ UpArrowOff proto
 LeftArrowOn proto
 RightArrowOn proto
 
+CheckLightening proto
 PauseGame proto
 
 CheckCollision proto obj:PTR EECS205BITMAP, obj2: PTR EECS205BITMAP
